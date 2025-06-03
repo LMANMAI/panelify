@@ -1,20 +1,33 @@
 import instance from "../config/axios";
 import authentication from "./authentication";
 
-const loginuser = async (user: any) => {
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface LoginError {
+  msg: string;
+  categoria: string;
+}
+
+const loginuser = async (
+  user: LoginCredentials,
+): Promise<{ response?: any; status?: number; mensaje?: LoginError }> => {
   try {
     const { data, status } = await instance.post("/auth", user);
     const response = await authentication();
     localStorage.setItem("token", data.token);
 
     return { response, status };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { msg: string } } };
     const mensaje = {
-      msg: error.response.data.msg,
+      msg: err.response?.data?.msg || "Error",
       categoria: "error",
     };
 
-    return { data: [], mensaje };
+    return { mensaje };
   }
 };
 

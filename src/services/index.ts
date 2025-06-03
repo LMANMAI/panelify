@@ -13,5 +13,6 @@ export { default as deleteTask } from "./deleteTask";
 
 //auth
 export { default as loginuser } from "./loginuser";
+export type { LoginCredentials } from "./loginuser";
 export { default as registeruser } from "./registeruser";
 export { default as authentication } from "./authentication";
