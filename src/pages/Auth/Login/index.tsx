@@ -11,21 +11,22 @@ import {
 import { Authwraper } from "../styles";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { loginuser } from "../../../services";
+import { loginuser, LoginCredentials } from "../../../services";
 import { setAuthenticated, setCurrentUser } from "../../../redux/slices/user";
 import { RootState } from "../../../redux/store";
-import { toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer, ToastOptions } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { movePanelAuth } from "../../../redux/slices/ui";
 
 type ToastType = "success" | "info" | "warning" | "error";
-const Login = (props: any) => {
+
+const Login = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [toastId, setToastId] = useState<any | null>(null);
+  const [toastId, setToastId] = useState<React.ReactText | null>(null);
 
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<LoginCredentials>({
     email: "",
     password: "",
   });
@@ -33,9 +34,9 @@ const Login = (props: any) => {
 
   const dispatch = useDispatch();
   const autenticathed = useSelector(
-    (state: RootState) => state.user.autenticathed
+    (state: RootState) => state.user.autenticathed,
   );
-  let history = useNavigate();
+  const navigate = useNavigate();
   const handleInputFocus = () => {
     setIsFocused(true);
   };
@@ -52,14 +53,14 @@ const Login = (props: any) => {
     setIsFocused2(false);
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUser({
       ...user,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmitLogin = async (e: any) => {
+  const handleSubmitLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setLoading(true);
     if (email.trim() === "" || password.trim() === "") {
@@ -75,7 +76,7 @@ const Login = (props: any) => {
           progress: undefined,
           theme: "light",
         },
-        "warning"
+        "warning",
       );
       setLoading(false);
       return;
@@ -90,7 +91,7 @@ const Login = (props: any) => {
           id: request.response._id,
           name: request.response.nombre,
           email: request.response.email,
-        })
+        }),
       );
 
       showNotification(
@@ -105,10 +106,10 @@ const Login = (props: any) => {
           progress: undefined,
           theme: "light",
         },
-        "success"
+        "success",
       );
       setTimeout(() => {
-        window.location.reload();
+        navigate("/");
       }, 2500);
     } else {
       showNotification(
@@ -123,7 +124,7 @@ const Login = (props: any) => {
           progress: undefined,
           theme: "light",
         },
-        "error"
+        "error",
       );
     }
     setLoading(false);
@@ -131,11 +132,15 @@ const Login = (props: any) => {
 
   useEffect(() => {
     if (autenticathed) {
-      history("/");
+      navigate("/");
     }
-  }, [autenticathed, props.history]);
+  }, [autenticathed, navigate]);
 
-  const showNotification = (msg: string, body: any, type: ToastType) => {
+  const showNotification = (
+    msg: string,
+    body: ToastOptions,
+    type: ToastType,
+  ) => {
     const id = toast[type](msg, body);
     setToastId(id);
   };
@@ -209,7 +214,8 @@ const Login = (props: any) => {
           <Content>
             <h3>¿Nuevo aqui?</h3>
             <p>
-              Crea una cuenta y comienza a planificar tus tareas en los paneles.{" "}
+              Crea una cuenta y comienza a planificar tus tareas en los
+              paneles.{" "}
             </p>
             <ButtonSec
               onClick={() => {
